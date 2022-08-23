@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.6'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+  id 'org.springframework.boot' version '2.6.6'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
 }
 
 group = 'org.fabianlee'
@@ -14,41 +14,40 @@ targetCompatibility = '17'
 
 // additional variables
 ext.dockerOwner = 'fabianlee'
+ext.dockerVersion = '1.0'
 ext['spring.version']='2.6.6' // moving to Spring Boot 2.7 would lead to breaking changes for WebSecurityConfigurerAdapter
 ext['spring.security.version']='5.6.6' // moving to Spring Security 5.7 would lead to breaking changes for WebSecurityConfigurerAdapter
 
 compileJava {
-	options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
 }
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	//implementation 'org.springframework.boot:spring-boot-starter-security' 
+  implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-  
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.2'
   
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
   
   implementation 'org.projectlombok:lombok' // compileOnly does not allow IDE to use annotations
   annotationProcessor 'org.projectlombok:lombok'
   
-  ///implementation 'org.thymeleaf:thymeleaf-spring5'
   implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0' // for JSON serialization
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 // makes BuildProperties available from Spring context
 springBoot {
-    buildInfo()
+  buildInfo()
 }
 
 // for debug purposes
@@ -85,17 +84,31 @@ task buildah(type: Exec) {
     }
    commandLine "buildah", "bud", "-f", "Dockerfile", "-t", project.name
 }
+task buildahTag(type: Exec) {
+   group "OCI"
+   commandLine "buildah", "tag", "localhost/${project.name}:${dockerVersion}", "docker.io/${dockerOwner}/${project.name}:${dockerVersion}" 
+}
+task buildahPush(type: Exec) {
+   group "OCI"
+   dependsOn "buildahTag"
+   commandLine "buildah", "push", "docker.io/${dockerOwner}/${project.name}:${dockerVersion}" 
+}
+
 
 task podmanCleanup(type: Exec) {
     ignoreExitValue true
     commandLine "podman", "rm", project.name
 }
-task podman(type: Exec) {
+task podmanRun(type: Exec) {
     group "OCI"
     // buildah does not cache, so do not force complete rebuild
     //dependsOn "buildah"
     dependsOn podmanCleanup
-    commandLine "podman", "run", "-p", "8080:8080", "--name", project.name, project.name
+    commandLine "podman", "run", 
+      "-p", "8080:8080", 
+      "--name", project.name,
+      "-e", "ADFS=${System.env.ADFS}", 
+      project.name
     doLast {
       println ""
       println "To cleanup, run 'podman rm ${project.name}'"
@@ -103,5 +116,18 @@ task podman(type: Exec) {
     }
 }
 
-
+task dockerCleanup(type: Exec) {
+    ignoreExitValue true
+    commandLine "docker", "rm", project.name
+}
+task dockerRun(type: Exec) {
+    group "OCI"
+    dependsOn dockerCleanup
+    commandLine "docker", "run",
+        "--network", "host", 
+        "-p", "8080:8080", 
+        "--name", project.name,
+        "-e", "ADFS=${System.env.ADFS}",
+        "${dockerOwner}/${project.name}:${dockerVersion}"
+}
 

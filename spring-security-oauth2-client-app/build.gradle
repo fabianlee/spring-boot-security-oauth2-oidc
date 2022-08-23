@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.6'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+  id 'org.springframework.boot' version '2.6.6'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'java'
 }
 
 group = 'org.fabianlee'
@@ -19,30 +19,28 @@ ext['spring.version']='2.6.6' // moving to Spring Boot 2.7 would lead to breakin
 ext['spring.security.version']='5.6.6' // moving to Spring Security 5.7 would lead to breaking changes for WebSecurityConfigurerAdapter
 
 compileJava {
-	options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
 }
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	//implementation 'org.springframework.boot:spring-boot-starter-security' 
+implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
   
   implementation 'org.projectlombok:lombok' // compileOnly does not allow IDE to use annotations
   annotationProcessor 'org.projectlombok:lombok'
   
-  ///implementation 'org.thymeleaf:thymeleaf-spring5'
   implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 // makes BuildProperties available from Spring context
@@ -99,7 +97,7 @@ task podmanCleanup(type: Exec) {
     ignoreExitValue true
     commandLine "podman", "rm", project.name
 }
-task podmanADFS(type: Exec) {
+task podmanRun(type: Exec) {
     group "OCI"
     
     // buildah does not cache, so do not force complete rebuild
@@ -109,10 +107,11 @@ task podmanADFS(type: Exec) {
     commandLine "podman", "run", 
         "-p", "8080:8080", 
         "--name", project.name,
-    	"-e", "ADFS_CLIENT_ID=${System.env.ADFS_CLIENT_ID}", 
-    	"-e", "ADFS_CLIENT_SECRET=${System.env.ADFS_CLIENT_SECRET}", 
-    	"-e", "ADFS=${System.env.ADFS}", 
-    	project.name
+        "-e", "ADFS_CLIENT_ID=${System.env.ADFS_CLIENT_ID}", 
+        "-e", "ADFS_CLIENT_SECRET=${System.env.ADFS_CLIENT_SECRET}", 
+        "-e", "ADFS=${System.env.ADFS}",
+        "-e", "ADFS_SCOPE=\"${System.env.ADFS_SCOPE}\"",        
+        project.name
     doLast {
       println ""
       println "To cleanup, run 'podman rm ${project.name}'"
@@ -132,8 +131,9 @@ task dockerRun(type: Exec) {
         "--network", "host", 
         "-p", "8080:8080", 
         "--name", project.name,
-    	"-e", "ADFS_CLIENT_ID=${System.env.ADFS_CLIENT_ID}", 
-    	"-e", "ADFS_CLIENT_SECRET=${System.env.ADFS_CLIENT_SECRET}", 
-    	"-e", "ADFS=${System.env.ADFS}", 
-    	"${dockerOwner}/${project.name}:${dockerVersion}"
+        "-e", "ADFS_CLIENT_ID=${System.env.ADFS_CLIENT_ID}", 
+        "-e", "ADFS_CLIENT_SECRET=${System.env.ADFS_CLIENT_SECRET}", 
+        "-e", "ADFS=${System.env.ADFS}",
+        "-e", "ADFS_SCOPE=\"${System.env.ADFS_SCOPE}\"",        
+        "${dockerOwner}/${project.name}:${dockerVersion}"
 }

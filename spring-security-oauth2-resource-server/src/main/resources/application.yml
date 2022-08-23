@@ -10,7 +10,6 @@ logging:
     ROOT: WARN
     org.springframework.web: TRACE
     org.apache.coyote: WARN
-    #org.thymeleaf: DEBUG
     org.springframework.web.client: DEBUG
     #org.springframework.boot.autoconfigure.security.oauth2.client: DEBUG
     org.fabianlee: DEBUG
@@ -31,11 +30,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer: https://win2k19-adfs1.fabian.lee/adfs
-          jwk-set-uri: https://win2k19-adfs1.fabian.lee/adfs/discovery/keys
-          token-uri: https://win2k19-adfs1.fabian.lee/adfs/oauth2/token
-          userInfoUri: https://win2k19-adfs1.fabian.lee/adfs/userinfo
-          user-info-uri: https://win2k19-adfs1.fabian.lee/adfs/userinfo
+          issuer: https://${ADFS:win2k19-adfs1.fabian.lee}/adfs
+          jwk-set-uri: https://${ADFS:win2k19-adfs1.fabian.lee}/adfs/discovery/keys
+          token-uri: https://${ADFS:win2k19-adfs1.fabian.lee}/adfs/oauth2/token
+          #userInfoUri: https://${ADFS:win2k19-adfs1.fabian.lee}/adfs/userinfo
+          user-info-uri: https://${ADFS:win2k19-adfs1.fabian.lee}/adfs/userinfo
           
           # for Google
           #issuer-uri: https://accounts.google.com

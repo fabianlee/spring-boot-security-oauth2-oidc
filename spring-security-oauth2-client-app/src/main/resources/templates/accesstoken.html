@@ -1,4 +1,5 @@
 <span th:switch="${accessToken !=null}">
+  <span th:case="false">There was no accessToken available</span>
   <span th:case="true">
     <h3>@RegisteredOAuth2AuthorizedClient accessToken</h3>
   	
@@ -24,7 +25,27 @@
   	<br/>
   	[[${accessToken.getTokenValue()}]]
   	
+<script>
+var url = "http://localhost:8081";
+var bearer = 'Bearer [[${accessToken.getTokenValue()}]]';
+fetch(url, {
+        method: 'GET',
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+            'Authorization': bearer,
+        }
+    }).then(responseJson => {
+        var items = JSON.parse(responseJson._bodyInit);
+    })
+    .catch(error => this.setState({
+        isLoading: false,
+        message: 'Something bad happened ' + error
+    }));
+</script>  	
+
+<h3>Test
+  	
   	
   </span>
-  <span th:case="false">There was no accessToken available</span>
 </span>
