@@ -78,4 +78,5 @@ public class SSLConfig {
         public void checkServerTrusted(X509Certificate[] certs, String authType) {
         }
     };    
-}
+    
+} // class

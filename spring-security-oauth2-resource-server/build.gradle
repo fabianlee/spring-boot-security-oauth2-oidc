@@ -38,7 +38,7 @@ dependencies {
   annotationProcessor 'org.projectlombok:lombok'
   
   implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0' // for JSON serialization
+  //implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0' // for JSON serialization
 }
 
 tasks.named('test') {
@@ -82,11 +82,11 @@ task buildah(type: Exec) {
     doFirst {
       println "Executing 'buildah' task"
     }
-   commandLine "buildah", "bud", "-f", "Dockerfile", "-t", project.name
+   commandLine "buildah", "bud", "-f", "Dockerfile", "-t", project.name, "-t", "${project.name}:${dockerVersion}"
 }
 task buildahTag(type: Exec) {
    group "OCI"
-   commandLine "buildah", "tag", "localhost/${project.name}:${dockerVersion}", "docker.io/${dockerOwner}/${project.name}:${dockerVersion}" 
+   commandLine "buildah", "tag", "localhost/${project.name}:${dockerVersion}", "docker.io/${dockerOwner}/${project.name}:${dockerVersion}"
 }
 task buildahPush(type: Exec) {
    group "OCI"
@@ -105,7 +105,7 @@ task podmanRun(type: Exec) {
     //dependsOn "buildah"
     dependsOn podmanCleanup
     commandLine "podman", "run", 
-      "-p", "8080:8080", 
+      "-p", "8081:8081",
       "--name", project.name,
       "-e", "ADFS=${System.env.ADFS}", 
       project.name
@@ -125,7 +125,7 @@ task dockerRun(type: Exec) {
     dependsOn dockerCleanup
     commandLine "docker", "run",
         "--network", "host", 
-        "-p", "8080:8080", 
+        "-p", "8081:8081", 
         "--name", project.name,
         "-e", "ADFS=${System.env.ADFS}",
         "${dockerOwner}/${project.name}:${dockerVersion}"
