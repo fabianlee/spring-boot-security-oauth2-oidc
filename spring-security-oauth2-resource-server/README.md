@@ -4,17 +4,29 @@ Minimal Spring Boot project that shows how to use gradle and [buildah](https://b
 
 Full blog: https://fabianlee.org/2022/08/03/java-creating-oci-compatible-image-for-spring-boot-web-using-buildah/
 
+
+## Run with gradle
+
+```
+./gradlew bootJar
+
+export ADFS=win2k19-adfs1.fabian.lee
+./gradlew bootRun
+```
+
+
 ## Create OCI image with buildah
 
 ```
 ./gradlew bootJar
-./gradlew buildah
+./gradlew buildah buildahTag buildahPush
 ```
 
 ## Run image with podman
 
 ```
-./gradlew podman
+export ADFS=win2k19-adfs1.fabian.lee
+./gradlew podmanRun
 ```
 
 ## Validate podman image running locally

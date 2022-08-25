@@ -2,15 +2,18 @@ package org.fabianlee.springsecurityoauth2resource.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.fabianlee.springsecurityoauth2resource.oauth2.OAuth2Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,40 +23,40 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/api/user")
 public class UserController {
 
         private List userListV1 = new ArrayList(Arrays.asList(new User("moe"), new User("larry"), new User("curly")));
         
+        
         @GetMapping(value="/me")
-        public String me() {
+        public Map meJSON() {
+        	// get logged in user context
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        	log.debug(auth.toString());
-        	log.debug("auth authorities: " + auth.getAuthorities());
-        	log.debug("===================");
         	JwtAuthenticationToken jwt = (JwtAuthenticationToken)auth;
-        	log.debug(jwt.toString());
+
+        	// just for debugging purposes, let's show all claims at console
+        	log.debug("auth authorities: " + auth.getAuthorities());
         	log.debug("jwt authorities: " + jwt.getAuthorities());
-        	for(Map.Entry<String,Object> entry : jwt.getTokenAttributes().entrySet()) {
-        		log.debug("att " + entry.getKey() + "=" + entry.getValue());
-        	}
         	for(Map.Entry<String,Object> entry : jwt.getToken().getClaims().entrySet() ) {
         		log.debug("claim: " + entry.getKey() + "=" + entry.getValue());
         	}
-        	
-        	StringBuffer sbuf = new StringBuffer();
-        	sbuf.append("email: " + jwt.getToken().getClaimAsString("email") + "\n");
-        	sbuf.append("authorities: " + auth.getAuthorities() + "\n");
-        	sbuf.append("group: " + jwt.getToken().getClaimAsString("group") + "\n");
-        	sbuf.append("scp: " + jwt.getToken().getClaimAsString("scp") + "\n");
-        	return sbuf.toString();
+
+        	// construct Map that can return json object with essential info
+            Map<String,String> info = new HashMap<String,String>(){{
+            		put("email",jwt.getToken().getClaimAsString("email"));
+            		put("authorities",auth.getAuthorities().toString());
+            		put("group",jwt.getToken().getClaimAsString("group"));
+            		put("scp",jwt.getToken().getClaimAsString("scp"));
+            }};
+
+            return info;
         }
 
         @GetMapping
@@ -64,6 +67,15 @@ public class UserController {
             log.warn("doing findAllUsers");
             log.error("doing findAllUsers");
             return userListV1;
+        }
+        
+        @RequestMapping(method = RequestMethod.OPTIONS)
+        ResponseEntity<?> singularOptions() 
+        {
+           return ResponseEntity
+               .ok()
+               .allow(HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.OPTIONS)
+                   .build();
         }
         
         @DeleteMapping
@@ -100,7 +112,7 @@ public class UserController {
             
             // log user email to show how audit entry could be created for sensitive info
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            log.debug("AUDIT info requested by: " + ((JwtAuthenticationToken)authentication).getToken().getClaimAsString("email"));
+            log.debug("AUDIT entry, sensitive info requested by: " + ((JwtAuthenticationToken)authentication).getToken().getClaimAsString("email"));
             
             List<User> managers = new ArrayList<User>( 
             		Arrays.asList(

@@ -4,29 +4,36 @@
  */
 package org.fabianlee.springsecurityoauth2resource.oauth2;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.server.resource.authentication.DelegatingJwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 @Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
+	@Autowired
+	private MyCORSFilter myCORSFilter;
+	
 @Override
 protected void configure(HttpSecurity http) throws Exception {
 	
     http
-        .cors().and()
-        .authorizeRequests(a -> a
-            .antMatchers("/","/info","login**").permitAll()
+    	.csrf().disable()
+    	// our custom CORS filter will not work properly if this is used  
+        //.cors().and() //configurationSource(corsConfigurationSource()).and()
+        .addFilterBefore(myCORSFilter, LogoutFilter.class).authorizeRequests(a -> a
+            .antMatchers("/","/info","/infojson","/testjwt","login**").permitAll()
+            .antMatchers(HttpMethod.OPTIONS).permitAll()
             //.antMatchers("/api/**").hasRole("USER") // 'ROLE_' will be prefixed for us
             .anyRequest().authenticated()
             )
@@ -65,6 +72,6 @@ public DelegatingJwtGrantedAuthoritiesConverter authoritiesConverter() {
     roles.setAuthorityPrefix("ROLE_");
     return new DelegatingJwtGrantedAuthoritiesConverter(scp, roles);
 }
-
     
 } // class
+

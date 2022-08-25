@@ -8,10 +8,8 @@ logging:
     name: oauth2-resource-server.log
   level:
     ROOT: WARN
-    org.springframework.web: TRACE
+    org.springframework.web: DEBUG
     org.apache.coyote: WARN
-    org.springframework.web.client: DEBUG
-    #org.springframework.boot.autoconfigure.security.oauth2.client: DEBUG
     org.fabianlee: DEBUG
   pattern:
     console: '[%thread] %-5level %logger{56} - %msg%n'

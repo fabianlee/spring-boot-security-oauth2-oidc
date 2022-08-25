@@ -17,6 +17,18 @@ ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
 auth_header="Authorization: Bearer ${JWT}"
 
 echo ""
+echo "===== OPTIONS to /infojson (unprotected) should return CORS headers  ====="
+curl -X OPTIONS -kIv -A "$ua" "$resource_server/infojson" 2>/dev/null | grep -E "^Access-Control|^HTTP"
+echo ""
+echo "===== GET to /infojson (unprotected) should return CORS headers  ====="
+curl -X GET -kIv -A "$ua" "$resource_server/infojson" 2>/dev/null | grep -E "^Access-Control|^HTTP"
+
+
+echo ""
+echo "===== OPTIONS to /api/user/me (unprotected) should return CORS headers  ====="
+curl -X OPTIONS -kIv -A "$ua" "$resource_server/api/user/me" 2>/dev/null | grep -E "^Access-Control|^HTTP"
+
+echo ""
 echo "===== GET to /api/user/me should return authenticated user email/authorities/scope/groups  ====="
 curl -X GET -k -A "$ua" "$resource_server/api/user/me" -H "$auth_header"
 
@@ -52,13 +64,13 @@ fi
 
 echo ""
 echo ""
-echo "===== GET to /api/user/manager should return list of managers, IFF callee in group 'managers' and 'api_delete' scope ====="
+echo "===== GET to /api/user/manager should return list of managers, IFF callee in group 'managers' ====="
 outstr=$(curl -A "$ua" $options "$resource_server/api/user/manager" -H "$auth_header")
 retVal=$?
 if [[ $retVal -eq 0 ]]; then
   curl -X GET -k -A "$ua" "$resource_server/api/user/manager" -H "$auth_header"
 else
-  echo "ERROR $retVal trying to GET /api/user/manager.  Are you in group 'managers' and have 'api_delete' scope?"
+  echo "ERROR $retVal trying to GET /api/user/manager.  Are you in group 'managers'?"
 fi
 
 echo ""

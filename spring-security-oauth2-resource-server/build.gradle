@@ -38,7 +38,6 @@ dependencies {
   annotationProcessor 'org.projectlombok:lombok'
   
   implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-  //implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0' // for JSON serialization
 }
 
 tasks.named('test') {
