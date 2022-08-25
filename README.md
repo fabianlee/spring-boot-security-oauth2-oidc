@@ -2,7 +2,7 @@
 
 blog: https://fabianlee.org/2022/08/25/java-spring-security-oauth2-oidc-protecting-client-app-and-resource-server/
 
-Java Spring Boot implementations of OAuth2:
+Java Spring Boot implementations of OAuth2 entities:
 
 * Client Application (web app)
 * Resource Server (microservice)
