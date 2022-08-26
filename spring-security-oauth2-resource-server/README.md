@@ -1,5 +1,5 @@
 # NOTICE - this is the legacy Spring Boot 2.6.6/Spring Security 5.6.6 version of my OAuth2 Resource Server using the deprecated WebSecurityConfigurerAdapter
-# You should look my newer [Spring Boot 2.7.3/Spring Security 5.7.3 version implementation](https://github.com/fabianlee/spring-boot-security5-oauth2-oidc)
+## You should look my newer [Spring Boot 2.7.3/Spring Security 5.7.3 version implementation](https://github.com/fabianlee/spring-boot-security5-oauth2-oidc)
 
 
 # spring-security-oauth2-resource-server
