@@ -6,20 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.fabianlee.springsecurityoauth2resource.oauth2.OAuth2Controller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,11 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/user")
 public class UserController {
 
-        private List userListV1 = new ArrayList(Arrays.asList(new User("moe"), new User("larry"), new User("curly")));
+        private List<User> userListV1 = new ArrayList<User>(Arrays.asList(new User("moe"), new User("larry"), new User("curly")));
         
         
         @GetMapping(value="/me")
-        public Map meJSON() {
+        public Map<String,String> meJSON() {
         	// get logged in user context
         	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         	JwtAuthenticationToken jwt = (JwtAuthenticationToken)auth;
@@ -61,7 +54,7 @@ public class UserController {
 
         @GetMapping
         @PreAuthorize("hasRole('Domain Users')")
-        public Iterable findAllUsers() {
+        public Iterable<User> findAllUsers() {
             log.debug("doing findAllUsers");
             log.info("doing findAllUsers");
             log.warn("doing findAllUsers");
@@ -80,7 +73,7 @@ public class UserController {
         
         @DeleteMapping
         @PreAuthorize("hasRole('managers') && hasAuthority('SCOPE_api_delete')")
-        public Iterable deleteUser() {
+        public Iterable<User> deleteUser() {
         	int nusers = userListV1.size();
             log.debug("called deleteUser");
             if (userListV1.size() > 0) {

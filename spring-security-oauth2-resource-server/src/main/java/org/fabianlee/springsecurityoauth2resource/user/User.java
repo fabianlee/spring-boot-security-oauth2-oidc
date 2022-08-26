@@ -1,8 +1,6 @@
 package org.fabianlee.springsecurityoauth2resource.user;
 
-import java.io.Serializable;
-
-public class User implements Serializable {
+public class User {
     private String name;
 
     public String getName() {
