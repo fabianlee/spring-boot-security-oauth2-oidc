@@ -33,12 +33,14 @@ protected void configure(HttpSecurity http) throws Exception {
 	
     http
     	.csrf().disable()
-    	// our custom CORS filter will not work properly if this is used  
+    	// our custom CORS filter will not work properly if this is used
+    	// using custom filter because I could not get cors() to work properly in this version of Spring
+    	// although it does work properly in newer versions using the newer SecurityFilterChain
         //.cors().and() //configurationSource(corsConfigurationSource()).and()
+    	//
         .addFilterBefore(myCORSFilter, LogoutFilter.class).authorizeRequests(a -> a
             .antMatchers("/","/info","/infojson","/testjwt","login**").permitAll()
             .antMatchers(HttpMethod.OPTIONS).permitAll()
-            //.antMatchers("/api/**").hasRole("USER") // 'ROLE_' will be prefixed for us
             .anyRequest().authenticated()
             )
         .oauth2ResourceServer(oauth2 -> oauth2.jwt()

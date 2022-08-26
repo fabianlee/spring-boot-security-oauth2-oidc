@@ -12,8 +12,8 @@ Full Blog: https://fabianlee.org/2022/08/25/java-spring-security-oauth2-oidc-pro
 Tested with:
 * OpenJDK 17
 * [Gradle 7.4](https://docs.gradle.org/current/userguide/compatibility.html)
-* spring-boot:2.6.6 (legacy)
-* spring-security-core:5.6.6 (legacy)
+* spring-boot:2.6.6
+* spring-security-core:5.6.6
 * [Windows 2019 ADFS as Authentication Server](https://fabianlee.org/2022/08/22/microsoft-configuring-an-application-group-for-oauth2-oidc-on-adfs-2019/)
 
 

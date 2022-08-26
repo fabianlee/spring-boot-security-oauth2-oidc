@@ -53,7 +53,6 @@ public class UserController {
         }
 
         @GetMapping
-        @PreAuthorize("hasRole('Domain Users')")
         public Iterable<User> findAllUsers() {
             log.debug("doing findAllUsers");
             log.info("doing findAllUsers");
